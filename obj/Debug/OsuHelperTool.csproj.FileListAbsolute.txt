@@ -1,0 +1,17 @@
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Debug\OsuHelperTool.exe.config
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Debug\OsuHelperTool.exe
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Debug\OsuHelperTool.pdb
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.csprojAssemblyReference.cache
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Properties.Resources.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.csproj.GenerateResource.cache
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.exe
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.pdb
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.MainScreen.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Classes.Miscellaneous.InformationForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Classes.Miscellaneous.PreferencesForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Debug\Newtonsoft.Json.dll
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Debug\Newtonsoft.Json.xml
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.csproj.CopyComplete
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Classes.Main.Merger.MergerForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Classes.Main.Merger.Bpm_Offset_ErrorMessageBox.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Debug\OsuHelperTool.Classes.Main.Merger.VersionName.resources

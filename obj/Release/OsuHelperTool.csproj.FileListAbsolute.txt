@@ -1,0 +1,17 @@
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Release\OsuHelperTool.exe.config
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Release\OsuHelperTool.exe
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Release\OsuHelperTool.pdb
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Release\Newtonsoft.Json.dll
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\bin\Release\Newtonsoft.Json.xml
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.csprojAssemblyReference.cache
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Classes.Main.Merger.Bpm_Offset_ErrorMessageBox.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Classes.Main.Merger.MergerForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Classes.Main.Merger.VersionName.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Classes.Miscellaneous.InformationForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Classes.Miscellaneous.PreferencesForm.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.MainScreen.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.Properties.Resources.resources
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.csproj.GenerateResource.cache
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.csproj.CopyComplete
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.exe
+C:\Users\juliu\Desktop\Programming\OsuHelperTool\obj\Release\OsuHelperTool.pdb
