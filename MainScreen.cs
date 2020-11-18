@@ -18,59 +18,64 @@ namespace OsuHelperTool
     public partial class MainScreen : Form
     {
         private Draggable _move;
-        private List<int> ButtonOrderToken;
-        private Color[] ColorArrayToken;
-        private string CurrentPath;
-        private string Orientation;
+        private List<int> ButtonOrderToken; //for customizing the button order
+        private Color[] ColorArrayToken; // for customizing the interface's colors
+        private string CurrentPath; // the current mapset path
+        private string Orientation; // tiny sqared interface vs regular rectengle interface
 
-        private List<Control> ButtonList1 = new List<Control>();
+        private List<Control> ButtonList1 = new List<Control>(); // for storing *ALL* controls of the menus
         private List<Control> ButtonList2 = new List<Control>();
         private List<Control> ButtonList3 = new List<Control>();
         private List<Control> ButtonList4 = new List<Control>();
+
+        private List<Control> Edited1 = new List<Control>(); // storing only the sub menu of the menus.
+        private List<Control> Edited2 = new List<Control>();
+        private List<Control> Edited3 = new List<Control>();
+        private List<Control> Edited4 = new List<Control>();
+
         Button PreviousButton;
         int counter = 0;
-        
-        
-        private List<Control> TempEdited1 = new List<Control>();
-        private List<Control> TempEdited2 = new List<Control>();
-        private List<Control> TempEdited3 = new List<Control>();
-        private List<Control> TempEdited4 = new List<Control>();
-        
 
 
 
-        
+
+
+        // Happends when the program is loading
+        #region Program Setup 
+
 
         public MainScreen()
         {
             InitializeComponent();
-            _move = new Draggable(this, FormBorder.Size.Height);
+
+            _move = new Draggable(this, FormBorder.Size.Height); // enables screen to be draggable
             _move.SetMovable(FormBorder, ProjectNameLabel);
 
-            refreshCheckJsonFile();
+            refreshCheckJsonFile(); // Check Preferences.json to fit the customization
 
-            PopulateMainTableLayout();
+            PopulateMainTableLayout(); //  Main category buttons are spawned
 
-            PopulateSubTableLayout();
+            PopulateSubTableLayout(); // the sub buttons(the features) are spawned.
 
-            List<List<Control>> TempLists = new List<List<Control>>(){ ButtonList1,ButtonList2,ButtonList3,ButtonList4};
-
-            List<List<Control>> TempEditedLists = new List<List<Control>>() { TempEdited1, TempEdited2, TempEdited3, TempEdited4 };
-
+            //
+            List<List<Control>> TempLists = new List<List<Control>>() { ButtonList1, ButtonList2, ButtonList3, ButtonList4 };
+            List<List<Control>> EditedLists = new List<List<Control>>() { Edited1, Edited2, Edited3, Edited4 };
             for (int i = 0; i < TempLists.Count; i = i + 1)
             {
-                foreach(var item in TempLists[i])
+                foreach (var item in TempLists[i])
                 {
-                    if(item.Tag == null)
+                    if (item.Tag == null)
                     {
-                        TempEditedLists[i].Add(item);
+                        EditedLists[i].Add(item);
                     }
                 }
             }
+            // For assigning the "edited" Variables, so only the sub buttons can be selected
+
 
             ConfigAppearance config = new ConfigAppearance();
 
-            config.SetTheme(this, ColorArrayToken, this, Orientation,FormBorder, InfoButton, CloseButton, MinimiseButton, PreferencesButton);
+            config.SetTheme(this, ColorArrayToken, this, Orientation, FormBorder, InfoButton, CloseButton, MinimiseButton, PreferencesButton);
 
             config.ApplyTheme();
 
@@ -83,62 +88,14 @@ namespace OsuHelperTool
 
         private void refreshCheckJsonFile()
         {
-            
+
             string check = File.ReadAllText(@"Preferences.json");
             var JsonConfigs = JsonConvert.DeserializeObject<ConfigJson>(check);
             ButtonOrderToken = JsonButtonOrderToList(JsonConfigs.GetButtonOrder());
             ColorArrayToken = JsonConfigs.GetColorArray();
             CurrentPath = JsonConfigs.GetCurrentPath();
             Orientation = JsonConfigs.GetOrientation();
-            
-        }
 
-        
-
-        #region Program Setup
-
-        public static List<int> JsonButtonOrderToList(string input)
-        {
-            string ButtonOrderToken = input;
-            string[] num = ButtonOrderToken.Split(',');
-
-            var resultList = new List<int>();
-
-            foreach (var n in num)
-            {
-                resultList.Add(Convert.ToInt32(n));
-            }
-
-            return resultList;
-        }
-
-        private void CloseButton_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void MinimiseButton_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Minimized;
-            
-        }
-
-        private void PreferencesButton_Click(object sender, EventArgs e)
-        {
-            Form form = new PreferencesForm(this);
-
-            //this.Enabled = false;
-            form.ShowDialog();
-
-        }
-
-        
-
-        private void InfoButton_Click(object sender, EventArgs e)
-        {
-            Form form = new InformationForm(this);
-            this.Enabled = false;
-            form.Show();
         }
 
         private void PopulateMainTableLayout() // credit: https://stackoverflow.com/questions/34426888/dynamic-button-creation-placing-them-in-a-predefined-order-using-c-sharp
@@ -165,17 +122,26 @@ namespace OsuHelperTool
                         b.Text = "Mapping Tool";
                         break;
                 }
+                #region mistake
+                /*
                 //b.Text = CommonMethods.FuncName(ButtonOrderToken[i]);
                 //b.Text = ButtonOrderToken[i].ToString(); //(i + 1).ToString();
                 //b.Name = string.Format("b_{0}", i + 1);
                 //b.Name = ButtonOrderToken[i].ToString();
+                */
+                #endregion
                 b.Margin = new Padding(0, 0, 0, 0);
                 b.FlatStyle = FlatStyle.Flat;
                 b.FlatAppearance.BorderSize = 0;
                 b.BackColor = ColorArrayToken[1];
                 b.Dock = DockStyle.Fill;
                 b.Click += new EventHandler(MainButton_Click);
-                switch (b.Tag)
+                
+                // until here-> generation of the Main button itself
+
+
+
+                switch (b.Tag) // Gives the order/position of the button
                 {
                     case 1:
                         MainPanel1.Controls.Add(b);
@@ -193,7 +159,7 @@ namespace OsuHelperTool
                         MainPanel4.Controls.Add(b);
                         break;
                 }
-                AddToButtonList(b, Convert.ToInt32(b.Tag));
+                AddToButtonList(b, Convert.ToInt32(b.Tag)); // Adds it to a global variable so it can be accessed later
             }
         }
 
@@ -202,25 +168,25 @@ namespace OsuHelperTool
             SubButtons Collab = new SubButtons() // credit https://www.youtube.com/watch?v=fMjt6ywaSow
             {
                 ID = ButtonOrderToken[0], //Merge Tool
-                //NumberOfFunc = 3,
+                
                 FuncNames = new List<string>() { "Merge Tool", "Compare Version", "Map Seperator Tool" }
             };
             SubButtons Hitsound = new SubButtons()
             {
                 ID = ButtonOrderToken[1], //Hitsound Tool
-                //NumberOfFunc = 2,
+                
                 FuncNames = new List<string>() { "Volume Tool", "Hitsound Editor" }
             };
             SubButtons Setup = new SubButtons()
             {
                 ID = ButtonOrderToken[2], // Setup Tool
-                //NumberOfFunc = 4,
+                
                 FuncNames = new List<string>() { "Song Setup", "Bpm Detector Tool", "Note Shifter/Snapper", "Tips" }
             };
             SubButtons Mapping = new SubButtons()
             {
                 ID = ButtonOrderToken[3], // Mapping Tool
-                //NumberOfFunc = 1,
+                
                 FuncNames = new List<string>() { "Slider Art Generator" }
             };
 
@@ -234,7 +200,7 @@ namespace OsuHelperTool
             foreach (KeyValuePair<int, SubButtons> key in SubButton)
             {
                 SubButtons button = key.Value;
-                switch (button.ID)
+                switch (button.ID) //Assigns the sub button to the correct positions
                 {
                     case 1:
                         SpawnSubButtons(TableMenu1, button.FuncNames, button.ID);
@@ -254,22 +220,14 @@ namespace OsuHelperTool
                 }
             }
 
-            /*
-             for (int i = 0; i < SubButtonLayoutTableHolder.ColumnCount; i = i + 1)
-            {
-                for (int y = 0; y < TableMenu1.RowCount; y = y + 1)
-                {
-                }
-            }
-            */
+            
         }
 
-        private void SpawnSubButtons(TableLayoutPanel control, List<string> funcNames, int ID)
+        private void SpawnSubButtons(TableLayoutPanel control, List<string> funcNames, int ID) //creation of the sub buttons
         {
             for (int i = 0; i < funcNames.Count; i = i + 1)
             {
                 Button b = new Button();
-                //if (i == 0) { b.Margin = new Padding(0, 0, 0, 1); } else { b.Margin = new Padding(0, 1, 0, 1); }
                 b.Margin = new Padding(0, 0, 0, 0);
                 b.Text = funcNames[i];
                 b.Name = funcNames[i];
@@ -281,11 +239,12 @@ namespace OsuHelperTool
                 b.Click += new EventHandler(SubButton_Click);
                 control.Controls.Add(b);
                 b.Visible = false;
-                AddToButtonList(b, ID);
+
+                AddToButtonList(b, ID); //Adds it to a variable to be accessible later on
             }
         }
 
-        private void AddToButtonList(Control b, int ID)
+        private void AddToButtonList(Control b, int ID) //helps group the entire category
         {
             switch (ID)
             {
@@ -307,6 +266,55 @@ namespace OsuHelperTool
             }
         }
 
+        public static List<int> JsonButtonOrderToList(string input)
+        {
+            string ButtonOrderToken = input;
+            string[] num = ButtonOrderToken.Split(',');
+
+            var resultList = new List<int>();
+
+            foreach (var n in num)
+            {
+                resultList.Add(Convert.ToInt32(n));
+            }
+
+            return resultList;
+        }
+
+
+        #region tablemenuclick
+        private void TableMenuMenuClick()
+        {
+            MakeVisibilityFalse(Edited1.ToArray(), Edited2.ToArray(), Edited3.ToArray(), Edited4.ToArray());
+            counter = 0;
+            Interface.BringToFront();
+        }
+
+        private void TableMenu4_MouseClick(object sender, MouseEventArgs e)
+        {
+            TableMenuMenuClick();
+        }
+
+        private void TableMenu3_MouseClick(object sender, MouseEventArgs e)
+        {
+            TableMenuMenuClick();
+        }
+
+        private void TableMenu2_MouseClick(object sender, MouseEventArgs e)
+        {
+            TableMenuMenuClick();
+        }
+
+        private void TableMenu1_MouseClick(object sender, MouseEventArgs e)
+        {
+            TableMenuMenuClick();
+        }
+        #endregion
+
+        #endregion Program Setup  
+
+        //Happends when the Category button is clicked
+        #region Main button stuff
         private void MainButton_Click(object sender, EventArgs e)
         {
             try
@@ -315,7 +323,7 @@ namespace OsuHelperTool
                 var JsonConfigs = JsonConvert.DeserializeObject<ConfigJson>(check);
                 CurrentPath = JsonConfigs.GetCurrentPath();
 
-                if (CurrentPath == "" || CurrentPath == null)
+                if (CurrentPath == "" || CurrentPath == null) //Makes sure that the Mapset path is not empty
                 {
                     throw Exceptions.NoMapsetPath;
                 }
@@ -358,7 +366,7 @@ namespace OsuHelperTool
 
                 if (counter == 2 && PreviousButton == (Button)sender)
                 {
-                    MakeVisibilityFalse(TempEdited1.ToArray(), TempEdited2.ToArray(), TempEdited3.ToArray(), TempEdited4.ToArray());
+                    MakeVisibilityFalse(Edited1.ToArray(), Edited2.ToArray(), Edited3.ToArray(), Edited4.ToArray());
                     counter = 0;
                     Interface.BringToFront();
 
@@ -378,7 +386,7 @@ namespace OsuHelperTool
                 MessageBox.Show(ex.Message);
             }
 
-            
+
 
             #region mistake
             /*
@@ -445,10 +453,10 @@ namespace OsuHelperTool
                 Edited3.RemoveAt(0);
                 Edited4.RemoveAt(0);
 
-                TempEdited1 = Edited1;
-                TempEdited2 = Edited2;
-                TempEdited3 = Edited3;
-                TempEdited4 = Edited4;
+                Edited1 = Edited1;
+                Edited2 = Edited2;
+                Edited3 = Edited3;
+                Edited4 = Edited4;
 
                 if (counter == 2 && PreviousButton == (Button)sender)
                 {
@@ -511,11 +519,11 @@ namespace OsuHelperTool
             #endregion
         }
 
-        private Control[] search(bool Invis, string valueToLookFor, params Control[][] input)
+        private Control[] search(bool Invis, string valueToLookFor, params Control[][] input) //Search for the requested Array
         {
             List<Control> result = new List<Control>();
-            
-            foreach(var item in input)
+
+            foreach (var item in input)
             {
                 if (!Invis)
                 {
@@ -529,7 +537,7 @@ namespace OsuHelperTool
                 }
                 else
                 {
-                    if(item[0].Text != valueToLookFor)
+                    if (item[0].Text != valueToLookFor)
                     {
                         for (int i = 1; i < item.Length; i = i + 1)
                         {
@@ -541,7 +549,7 @@ namespace OsuHelperTool
 
             return result.ToArray();
         }
-        
+
 
         private void MakeVisibilityFalse(params Control[][] input)
         {
@@ -565,36 +573,10 @@ namespace OsuHelperTool
             }
         }
 
-        #region tablemenuclick
-        private void TableMenuMenuClick()
-        {
-            MakeVisibilityFalse(TempEdited1.ToArray(), TempEdited2.ToArray(), TempEdited3.ToArray(), TempEdited4.ToArray());
-            counter = 0;
-            Interface.BringToFront();
-        }
-
-        private void TableMenu4_MouseClick(object sender, MouseEventArgs e)
-        {
-            TableMenuMenuClick();
-        }
-
-        private void TableMenu3_MouseClick(object sender, MouseEventArgs e)
-        {
-            TableMenuMenuClick();
-        }
-
-        private void TableMenu2_MouseClick(object sender, MouseEventArgs e)
-        {
-            TableMenuMenuClick();
-        }
-
-        private void TableMenu1_MouseClick(object sender, MouseEventArgs e)
-        {
-            TableMenuMenuClick();
-        }
         #endregion
 
-        #endregion Program Setup
+        //Happends when the Feature button is clicked
+        #region sub button stuff
 
         private void SubButton_Click(object sender, EventArgs e)
         {
@@ -604,7 +586,7 @@ namespace OsuHelperTool
 
             counter = counter - 1;
 
-            MakeVisibilityFalse(TempEdited1.ToArray(), TempEdited2.ToArray(), TempEdited3.ToArray(), TempEdited4.ToArray());
+            MakeVisibilityFalse(Edited1.ToArray(), Edited2.ToArray(), Edited3.ToArray(), Edited4.ToArray());
 
             //MakeHeaderButtonVisibleTrue(ButtonList1.ToArray(), ButtonList2.ToArray(), ButtonList3.ToArray(), ButtonList4.ToArray());
 
@@ -666,6 +648,39 @@ namespace OsuHelperTool
             childForm.Show();
         }
 
-        
+        #endregion
+
+
+        //Happends when the form border options are clicked.
+        #region form border stuff
+        private void CloseButton_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MinimiseButton_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+
+        }
+
+        private void PreferencesButton_Click(object sender, EventArgs e)
+        {
+            Form form = new PreferencesForm(this);
+
+            //this.Enabled = false;
+            form.ShowDialog();
+
+        }
+
+        private void InfoButton_Click(object sender, EventArgs e)
+        {
+            Form form = new InformationForm(this);
+            this.Enabled = false;
+            form.Show();
+        }
+
+        #endregion
+
     }
 }
