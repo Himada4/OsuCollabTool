@@ -110,7 +110,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(397, 86);
             this.label1.TabIndex = 1;
-            this.label1.Text = "From Mapset";
+            this.label1.Text = "Files to Merge";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tableLayoutPanel1
@@ -194,7 +194,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(395, 86);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Files to Merge";
+            this.label2.Text = "From Mapset ";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // MergeButton

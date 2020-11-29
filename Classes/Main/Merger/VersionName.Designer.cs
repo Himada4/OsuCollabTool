@@ -71,6 +71,7 @@
             this.Controls.Add(this.Label);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "VersionName";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "VersionName";
             this.ResumeLayout(false);
             this.PerformLayout();

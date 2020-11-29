@@ -13,8 +13,7 @@ namespace OsuHelperTool.Classes.Main.Merger
         #region setup
 
         private bool directlyDropped = false;
-        private List<List<string>> PUninheritedPoints = new List<List<string>>();
-        private List<int> PNumOfUPInFileList = new List<int>();
+        
 
         public MergerForm()
         {
@@ -115,16 +114,16 @@ namespace OsuHelperTool.Classes.Main.Merger
 
         private async void MergeButton_Click(object sender, EventArgs e)
         {
-            try 
+            try
             {
                 if (MergeList.Items.Count >= 2)
                 {
-                    Task<Exception> task = new Task<Exception>(CheckMergeErrors);
+                    Task<Exception> task = new Task<Exception>(PopupManager);
                     task.Start();
 
                     MergeButton.Text = "Processing...";
                     Exception a = await task;
-                    if(a == Exceptions.CancelOperation)
+                    if (a == Exceptions.CancelOperation)
                     {
                         throw a;
                     }
@@ -135,18 +134,19 @@ namespace OsuHelperTool.Classes.Main.Merger
                     MessageBox.Show("Please put at least 2 files to continue.");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-            } 
+            }
         }
 
-        private Exception CheckMergeErrors()
+        
+        
+
+        private Exception PopupManager()
         {
             // try
             // {
-            
-
             List<string> Files = new List<string>();
             List<string> FilesForEMessageBox = new List<string>();
 
@@ -156,9 +156,9 @@ namespace OsuHelperTool.Classes.Main.Merger
                 FilesForEMessageBox.Add(file.ToString());
             }
 
-            #region gets timing panels VAR = TimingPanels
+            #region gets timing panels VAR = TimingPoints
 
-            List<List<string>> TimingPanels = new List<List<string>>();
+            List<List<string>> TimingPoints = new List<List<string>>();
 
             foreach (var file in Files)
             {
@@ -182,13 +182,13 @@ namespace OsuHelperTool.Classes.Main.Merger
                     line = sr.ReadLine();
                 }
 
-                TimingPanels.Add(List);
+                TimingPoints.Add(List);
 
                 //close the file
                 sr.Close();
             }
 
-            #endregion gets timing panels VAR = TimingPanels
+            #endregion gets timing panels VAR = TimingPoints
 
             #region gets hitobjects VAR = HitObjects
 
@@ -224,69 +224,75 @@ namespace OsuHelperTool.Classes.Main.Merger
 
             #endregion gets hitobjects VAR = HitObjects
 
-            #region find possible errors *ONLY DEALS WITH TIMING PANELS*
-
-            Exception exceptions = FindBpmErrors(TimingPanels); //returns the possible errors of having unique bpms or offsets
-
             List<List<string>> FinalTimingPoint = new List<List<string>>();
             List<List<string>> FinalHitObjects = new List<List<string>>();
 
             Exception operationCancelled = new Exception();
-            
 
-            if (exceptions != null) // if problem found,  from https://www.youtube.com/watch?v=8aDsXyiBLsI&list=LL&index=5
+            var UninheritedPoints = GetUP(TimingPoints);
+
+            // credit https://www.youtube.com/watch?v=8aDsXyiBLsI&list=LL&index=5
+
+            using (Bpm_Offset_ErrorMessageBox EBox = new Bpm_Offset_ErrorMessageBox(TimingPoints, UninheritedPoints, FilesForEMessageBox))
             {
-                using (Bpm_Offset_ErrorMessageBox EBox = new Bpm_Offset_ErrorMessageBox(TimingPanels,PUninheritedPoints,FilesForEMessageBox,PNumOfUPInFileList,exceptions))
+                Invoke((Action)(() => { EBox.ShowDialog(); }));
+                if (EBox.DialogResult == DialogResult.Ignore)
                 {
-                    Invoke((Action)(() => { EBox.ShowDialog(); }));
-                    if (EBox.DialogResult == DialogResult.Ignore)
-                    {
-                        FinalTimingPoint = EBox.newTimingPanel;
-                        FinalHitObjects = HitObjects;
-                        StartMerge(FinalHitObjects, FinalTimingPoint);
-                        
-                    }
-                    else if (EBox.DialogResult == DialogResult.OK)
-                    {
-                        FinalTimingPoint = EBox.newTimingPanel;
-                        FinalHitObjects = HitObjects;
-                        StartMerge(FinalHitObjects, FinalTimingPoint);
+                    FinalTimingPoint = EBox.newTimingPoint;
+                    FinalHitObjects = HitObjects;
+                    StartMerge(FinalHitObjects, FinalTimingPoint);
+                }
+                else if (EBox.DialogResult == DialogResult.OK)
+                {
+                    FinalTimingPoint = EBox.newTimingPoint;
+                    FinalHitObjects = HitObjects;
+                    StartMerge(FinalHitObjects, FinalTimingPoint);
+                }
+                else
+                {
+                    operationCancelled = Exceptions.CancelOperation;
+                }
+            }
 
-                    }
-                    else
+            return operationCancelled;
+        }
+
+        private List<List<string>> GetUP(List<List<string>> TimingPoints)
+        {
+            List<List<string>> UninheritedPoints = new List<List<string>>();
+
+            for(int y = 0; y < TimingPoints.Count; y = y + 1)
+            {
+                for (int i = 0; i < TimingPoints[y].Count; i = i + 1)
+                {
+                    string[] split = TimingPoints[y][i].Split(',');
+
+                    List<string> Temp = new List<string>();
+
+                    if (!split[1].Contains("-"))
                     {
-                        operationCancelled = Exceptions.CancelOperation;
+                        Temp.Add(split[0]);
+                        Temp.Add(split[1]);
+                        Temp.Add(y.ToString());
+                        UninheritedPoints.Add(Temp);
+                        
                     }
                 }
             }
 
-            #endregion find possible errors *ONLY DEALS WITH TIMING PANELS*
-
-            //MergeLists(TimingPanels, true);
-            //MergeLists(HitObjects, false);
-
-            return operationCancelled;
-            // }
-            // catch (Exception ex)
-            // {
-            //     if (ex == null)
-            //    {
-            //        return false;
-            //    }
-
-            //    return false;
-            //}
+            return UninheritedPoints;
         }
 
-        private void StartMerge(List<List<string>> HitObjects, List<List<string>> TimingPanels)
+        #region for merging the final things only
+
+        private void StartMerge(List<List<string>> HitObjects, List<List<string>> TimingPoints)
         {
             List<string> FinalHitObjects = mergeLists(HitObjects, false);
-            List<string> FinalTimingPanels = mergeLists(TimingPanels, true);
+            List<string> FinalTimingPoints = mergeLists(TimingPoints, true);
 
             StreamReader sr = new StreamReader($@"{ChildFormConfig.GetMapsetPath()}\{MergeList.Items[0]}");
 
             var line = sr.ReadLine();
-
 
             List<string> template = new List<string>();
 
@@ -303,7 +309,6 @@ namespace OsuHelperTool.Classes.Main.Merger
                 {
                     line = $"Version: {VName.VersionNameV}";
                 }
-                
             }
 
             while (line != "[TimingPoints]")
@@ -314,7 +319,7 @@ namespace OsuHelperTool.Classes.Main.Merger
 
             template.Add("[TimingPoints]");
 
-            foreach (var lines in FinalTimingPanels)
+            foreach (var lines in FinalTimingPoints)
             {
                 template.Add(lines);
             }
@@ -337,15 +342,8 @@ namespace OsuHelperTool.Classes.Main.Merger
                 template.Add(lines);
             }
 
-
-
-
             //close the file
             sr.Close();
-
-
-
-            
 
             //File.WriteAllLines(@"C:\Users\juliu\Desktop\Osu!\Songs\Camellia - Camellia 200Step Mix/testtest.txt", template);
 
@@ -368,8 +366,7 @@ namespace OsuHelperTool.Classes.Main.Merger
             writer.Close();
         }
 
-
-        public static List<string> mergeLists(List<List<string>> input, bool IsItTimingPanel)
+        public static List<string> mergeLists(List<List<string>> input, bool IsItTimingPoint)
         {
             List<string> Merged = new List<string>();
 
@@ -378,33 +375,29 @@ namespace OsuHelperTool.Classes.Main.Merger
                 Merged.AddRange(file);
             }
 
-            sort(Merged, IsItTimingPanel, 0, Merged.Count - 1);
-
+            sort(Merged, IsItTimingPoint, 0, Merged.Count - 1);
 
             return Merged;
         }
 
-        private static void sort(List<string> input, bool IsItTimingPanel, int lo, int hi) // https://en.wikipedia.org/wiki/Quicksort
+        private static void sort(List<string> input, bool IsItTimingPoint, int lo, int hi) // https://en.wikipedia.org/wiki/Quicksort
         {
-     
             if (lo < hi)
             {
-                int pi = Partition(input, lo, hi, IsItTimingPanel);
-                sort(input, IsItTimingPanel, lo, pi - 1);
-                sort(input, IsItTimingPanel, pi + 1, hi);
+                int pi = Partition(input, lo, hi, IsItTimingPoint);
+                sort(input, IsItTimingPoint, lo, pi - 1);
+                sort(input, IsItTimingPoint, pi + 1, hi);
             }
-
         }
 
-        private static int Partition(List<string> input, int lo, int hi, bool IsItTimingPanel)
+        private static int Partition(List<string> input, int lo, int hi, bool IsItTimingPoint)
         {
-            
-            int pivot = ConvertLineToOffset(input[hi], IsItTimingPanel);
+            int pivot = ConvertLineToOffset(input[hi], IsItTimingPoint);
             int i = lo - 1;
 
             for (int j = lo; j < hi; j = j + 1)
             {
-                if (ConvertLineToOffset(input[j], IsItTimingPanel) < pivot)
+                if (ConvertLineToOffset(input[j], IsItTimingPoint) < pivot)
                 {
                     i = i + 1;
 
@@ -421,11 +414,11 @@ namespace OsuHelperTool.Classes.Main.Merger
             return i + 1;
         }
 
-        private static int ConvertLineToOffset(string input, bool IsItTimingPanel)
+        private static int ConvertLineToOffset(string input, bool IsItTimingPoint)
         {
             int offset = 0;
             string[] tempArray = input.Split(',');
-            if (IsItTimingPanel)
+            if (IsItTimingPoint)
             {
                 offset = Convert.ToInt32(tempArray[0]);
             }
@@ -436,139 +429,9 @@ namespace OsuHelperTool.Classes.Main.Merger
             return offset;
         }
 
+        #endregion for merging the final things only
 
-
-
-        private Exception FindBpmErrors(List<List<string>> TimingPanels)
-        {
-            Exception error = new Exception();
-
-            List<List<string>> UninheritedPoints = new List<List<string>>();
-
-            List<int> NumOfUPInFileList = new List<int>();
-
-            
-
-            foreach (var item in TimingPanels)
-            {
-                int NumOfUPInFile = 0;
-                for (int i = 0; i < item.Count; i = i + 1)
-                {
-                    string[] split = item[i].Split(',');
-
-                    List<string> Temp = new List<string>();
-
-                    if (!split[1].Contains("-"))
-                    {
-                        Temp.Add(split[0]);
-                        Temp.Add(split[1]);
-                        UninheritedPoints.Add(Temp);
-                        NumOfUPInFile = NumOfUPInFile + 1;
-                    }
-                }
-                NumOfUPInFileList.Add(NumOfUPInFile);
-            }
-
-            foreach (var item in UninheritedPoints)
-            {
-                if (DecisionSelfLoop(item, UninheritedPoints))
-                {
-                    error = Exceptions.INHERITANCE_ERROR;
-                }
-            }
-
-            PUninheritedPoints = UninheritedPoints;
-            PNumOfUPInFileList = NumOfUPInFileList;
-
-            #region mistakes
-
-            /*
-
-            #region bpm
-
-            List<List<string>> BPMs = TimingPanelBpm(TimingPanels);
-
-            List<string> MergedBpms = new List<string>();
-            foreach (var bpm in BPMs)
-            {
-                MergedBpms.AddRange(bpm);
-            }
-
-            foreach (var bpm in MergedBpms)
-            {
-                if (!DecisionSelfLoop(bpm, MergedBpms))
-                {
-                    error.Add(Exceptions.BPM_ERROR);
-                }
-            }
-
-            #endregion bpm
-
-            #region offset
-
-            List<List<string>> Offsets = TimingPanelOffset(TimingPanels);
-            List<string> MergedOffsets = new List<string>();
-            foreach (var offset in Offsets)
-            {
-                MergedOffsets.AddRange(offset);
-            }
-
-            foreach (var item in MergedOffsets)
-            {
-                if (!DecisionSelfLoop(item, MergedOffsets))
-                {
-                    error.Add(Exceptions.OFFSET_ERROR);
-                }
-            }
-
-            #endregion offset
-
-            */
-
-            #endregion mistakes
-
-            if (error != Exceptions.INHERITANCE_ERROR)
-            {
-                error = null;
-            }
-
-            return error;
-        }
-
-        private bool DecisionSelfLoop(List<string> inputToFind, List<List<string>> inputToLoop)
-        {
-            int found = 0;
-            foreach (var item in inputToLoop)
-            {
-                if (inputToFind[0] == item[0] && inputToFind[1] == item[1])
-                {
-                    found = found + 1;
-                }
-            }
-            bool errorFound = true;
-            if (MergeList.Items.Count % 2 == 1)
-            {
-                if(found % 2 == 1)
-                {
-                    errorFound = false;
-                } 
-            }
-            else
-            {
-                if (found % 2 == 0)
-                {
-                    errorFound = false;
-                }
-            }
-            
-            if(found == 1)
-            {
-                errorFound = true;
-            }
-            
-            return errorFound;
-        }
-
+        
         
     }
 }

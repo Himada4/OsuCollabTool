@@ -53,9 +53,9 @@
             this.ErrorMsg.AutoSize = true;
             this.ErrorMsg.Location = new System.Drawing.Point(12, 9);
             this.ErrorMsg.Name = "ErrorMsg";
-            this.ErrorMsg.Size = new System.Drawing.Size(35, 13);
+            this.ErrorMsg.Size = new System.Drawing.Size(233, 13);
             this.ErrorMsg.TabIndex = 1;
-            this.ErrorMsg.Text = "label1";
+            this.ErrorMsg.Text = "Would you like to delete any uninherited points?";
             // 
             // DeleteSelected
             // 
@@ -104,7 +104,7 @@
             this.MinimizeBox = false;
             this.Name = "Bpm_Offset_ErrorMessageBox";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Bpm_Offset_ErrorMessageBox";
+            this.Text = "Before merging...";
             this.Load += new System.EventHandler(this.Bpm_Offset_ErrorMessageBox_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -31,8 +31,6 @@ namespace OsuHelperTool.Classes.Common
             }
         }
 
-        public static Exception INHERITANCE_ERROR = new Exception("Multiple unique Offsets/BPMs of uninherited points were detected. Would you still like to continue?");
-        
         public static Exception NoMapsetPath = new Exception("Please set the mapset path via preferences.");
 
         public static Exception CancelOperation = new Exception("Operation has been cancelled.");
